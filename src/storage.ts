@@ -4,9 +4,13 @@ import type { AppData, Member, Team } from './types';
 const STORAGE_KEY = 'team-maker-data';
 
 const DEFAULT_TEAMS: Team[] = [
-  { id: 'team-1', name: '1조' },
-  { id: 'team-2', name: '2조' },
+  { id: 'team-1', name: '1팀' },
+  { id: 'team-2', name: '2팀' },
 ];
+
+function normalizeTeamName(name: string): string {
+  return name.replace(/^(\d+)조$/, '$1팀');
+}
 
 export const DEFAULT_DATA: AppData = {
   members: [],
@@ -38,7 +42,13 @@ export function loadData(): AppData {
       members: parsed.members
         .map((member) => normalizeMember(member))
         .filter((member): member is Member => Boolean(member)),
-      teams: parsed.teams.length > 0 ? parsed.teams : DEFAULT_TEAMS,
+      teams:
+        parsed.teams.length > 0
+          ? parsed.teams.map((team) => ({
+              ...team,
+              name: normalizeTeamName(team.name),
+            }))
+          : DEFAULT_TEAMS,
     };
   } catch {
     return DEFAULT_DATA;

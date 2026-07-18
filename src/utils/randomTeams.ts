@@ -77,6 +77,6 @@ export function createTeams(count: number): Team[] {
   const safeCount = Math.max(1, Math.min(12, count));
   return Array.from({ length: safeCount }, (_, index) => ({
     id: `team-${index + 1}`,
-    name: `${index + 1}조`,
+    name: `${index + 1}팀`,
   }));
 }

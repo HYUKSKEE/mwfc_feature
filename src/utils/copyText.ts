@@ -30,12 +30,9 @@ export function formatMemberList(
   members: Array<{ name: string; skillLabel?: string }>,
 ): string {
   if (members.length === 0) {
-    return `${title}\n(인원 없음)`;
+    return `${title}: (인원 없음)`;
   }
 
-  const lines = members.map((member, index) => {
-    const skill = member.skillLabel ? ` (${member.skillLabel})` : '';
-    return `${index + 1}. ${member.name}${skill}`;
-  });
-  return `${title}\n${lines.join('\n')}`;
+  const names = members.map((member) => member.name).join(', ');
+  return `${title}: ${names}`;
 }

@@ -106,7 +106,7 @@ export function Controls({
         >
           {Array.from({ length: 10 }, (_, index) => index + 1).map((count) => (
             <option key={count} value={count}>
-              {count}조
+              {count}팀
             </option>
           ))}
         </Select>
