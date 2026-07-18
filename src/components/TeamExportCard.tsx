@@ -1,6 +1,5 @@
 import { forwardRef } from 'react';
 import styled from 'styled-components';
-import { getSkillLabel } from '../constants/skill';
 import type { Member, Team } from '../types';
 
 type Props = {
@@ -143,9 +142,6 @@ export const TeamExportCard = forwardRef<HTMLDivElement, Props>(
               {members.map((member, index) => (
                 <Item key={member.id}>
                   {index + 1}. {member.name}
-                  <span style={{ color: '#8a8a8a', marginLeft: 8 }}>
-                    ({getSkillLabel(member.skill)})
-                  </span>
                 </Item>
               ))}
             </List>
