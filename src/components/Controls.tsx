@@ -3,9 +3,11 @@ import styled from 'styled-components';
 type Props = {
   teamCount: number;
   memberCount: number;
+  isExporting?: boolean;
   onTeamCountChange: (count: number) => void;
   onRandomAssign: () => void;
   onClearAssignments: () => void;
+  onExportImage: () => void;
 };
 
 const Bar = styled.div`
@@ -17,6 +19,10 @@ const Bar = styled.div`
   background: ${({ theme }) => theme.colors.bgElevated};
   border: 1px solid ${({ theme }) => theme.colors.border};
   border-radius: ${({ theme }) => theme.radii.lg};
+
+  @media (max-width: 860px) {
+    gap: 0.6rem;
+  }
 `;
 
 const Label = styled.label`
@@ -28,12 +34,14 @@ const Label = styled.label`
 `;
 
 const Select = styled.select`
+  min-height: 40px;
   padding: 0.55rem 0.75rem;
   border: 1px solid ${({ theme }) => theme.colors.border};
   border-radius: ${({ theme }) => theme.radii.sm};
   background: ${({ theme }) => theme.colors.bg};
   color: ${({ theme }) => theme.colors.text};
   outline: none;
+  font-size: 1rem;
 
   &:focus {
     border-color: ${({ theme }) => theme.colors.accent};
@@ -41,6 +49,7 @@ const Select = styled.select`
 `;
 
 const Button = styled.button<{ $variant?: 'primary' | 'ghost' }>`
+  min-height: 40px;
   padding: 0.65rem 1.1rem;
   border-radius: ${({ theme }) => theme.radii.md};
   border: 1px solid
@@ -52,31 +61,39 @@ const Button = styled.button<{ $variant?: 'primary' | 'ghost' }>`
   font-weight: 600;
   transition:
     background 0.15s ease,
-    border-color 0.15s ease,
-    transform 0.15s ease;
+    border-color 0.15s ease;
 
   &:hover:not(:disabled) {
     background: ${({ theme, $variant }) =>
       $variant === 'ghost' ? theme.colors.bgHover : theme.colors.accentHover};
-    transform: translateY(-1px);
   }
 
   &:disabled {
     opacity: 0.45;
     cursor: not-allowed;
   }
+
+  @media (max-width: 860px) {
+    flex: 1 1 calc(50% - 0.3rem);
+  }
 `;
 
 const Spacer = styled.div`
   flex: 1;
+
+  @media (max-width: 860px) {
+    display: none;
+  }
 `;
 
 export function Controls({
   teamCount,
   memberCount,
+  isExporting = false,
   onTeamCountChange,
   onRandomAssign,
   onClearAssignments,
+  onExportImage,
 }: Props) {
   return (
     <Bar>
@@ -99,16 +116,24 @@ export function Controls({
         type="button"
         $variant="ghost"
         onClick={onClearAssignments}
-        disabled={memberCount === 0}
+        disabled={memberCount === 0 || isExporting}
       >
         배정 초기화
       </Button>
       <Button
         type="button"
-        onClick={onRandomAssign}
-        disabled={memberCount === 0}
+        $variant="ghost"
+        onClick={onExportImage}
+        disabled={memberCount === 0 || isExporting}
       >
-        랜덤 조짜기
+        {isExporting ? '저장 중...' : '각 조별 이미지 저장'}
+      </Button>
+      <Button
+        type="button"
+        onClick={onRandomAssign}
+        disabled={memberCount === 0 || isExporting}
+      >
+        밸런스 랜덤 조짜기
       </Button>
     </Bar>
   );

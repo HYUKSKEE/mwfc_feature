@@ -1,4 +1,5 @@
-import type { AppData, Team } from './types';
+import { normalizeSkill } from './constants/skill';
+import type { AppData, Member, Team } from './types';
 
 const STORAGE_KEY = 'team-maker-data';
 
@@ -12,6 +13,17 @@ export const DEFAULT_DATA: AppData = {
   teams: DEFAULT_TEAMS,
 };
 
+function normalizeMember(raw: Partial<Member>): Member | null {
+  if (typeof raw.id !== 'string' || typeof raw.name !== 'string') return null;
+
+  return {
+    id: raw.id,
+    name: raw.name,
+    skill: normalizeSkill(raw.skill),
+    teamId: typeof raw.teamId === 'string' ? raw.teamId : null,
+  };
+}
+
 export function loadData(): AppData {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -23,7 +35,9 @@ export function loadData(): AppData {
     }
 
     return {
-      members: parsed.members,
+      members: parsed.members
+        .map((member) => normalizeMember(member))
+        .filter((member): member is Member => Boolean(member)),
       teams: parsed.teams.length > 0 ? parsed.teams : DEFAULT_TEAMS,
     };
   } catch {

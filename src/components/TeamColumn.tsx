@@ -1,13 +1,15 @@
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import styled from 'styled-components';
-import type { Member, Team } from '../types';
+import { getSkillLabel } from '../constants/skill';
+import type { Member, SkillLevel, Team } from '../types';
+import { CopyListButton } from './CopyListButton';
 import { DropZone } from './DropZone';
 import { MemberCard } from './MemberCard';
 
 type Props = {
   team: Team;
   members: Member[];
-  onEdit: (member: Member) => void;
+  onUpdate: (id: string, patch: { name: string; skill: SkillLevel }) => void;
   onDelete: (id: string) => void;
 };
 
@@ -24,11 +26,17 @@ const Column = styled.section`
 
 const Header = styled.div`
   display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding-bottom: 0.65rem;
+  border-bottom: 2px solid ${({ theme }) => theme.colors.accent};
+`;
+
+const TitleRow = styled.div`
+  display: flex;
   align-items: baseline;
   justify-content: space-between;
   gap: 0.75rem;
-  padding-bottom: 0.65rem;
-  border-bottom: 2px solid ${({ theme }) => theme.colors.accent};
 `;
 
 const Title = styled.h2`
@@ -44,26 +52,43 @@ const Count = styled.span`
   font-size: 0.85rem;
 `;
 
-export function TeamColumn({ team, members, onEdit, onDelete }: Props) {
+const Actions = styled.div`
+  display: flex;
+  justify-content: flex-end;
+`;
+
+export function TeamColumn({ team, members, onUpdate, onDelete }: Props) {
   const itemIds = members.map((member) => member.id);
+  const skillTotal = members.reduce((sum, member) => sum + member.skill, 0);
+  const copyMembers = members.map((member) => ({
+    name: member.name,
+    skillLabel: getSkillLabel(member.skill),
+  }));
 
   return (
     <Column>
       <Header>
-        <Title>{team.name}</Title>
-        <Count>{members.length}명</Count>
+        <TitleRow>
+          <Title>{team.name}</Title>
+          <Count>
+            {members.length}명 · 실력합 {skillTotal}
+          </Count>
+        </TitleRow>
+        <Actions>
+          <CopyListButton title={team.name} members={copyMembers} />
+        </Actions>
       </Header>
       <DropZone
         id={team.id}
         isEmpty={members.length === 0}
-        emptyLabel="팀원을 여기로 드래그"
+        emptyLabel="핸들로 팀원을 여기로 드래그"
       >
         <SortableContext items={itemIds} strategy={verticalListSortingStrategy}>
           {members.map((member) => (
             <MemberCard
               key={member.id}
               member={member}
-              onEdit={onEdit}
+              onUpdate={onUpdate}
               onDelete={onDelete}
             />
           ))}

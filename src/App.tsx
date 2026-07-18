@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   DndContext,
   DragOverlay,
@@ -11,15 +11,18 @@ import type { DragEndEvent, UniqueIdentifier } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
 import styled, { ThemeProvider, keyframes } from 'styled-components';
 import { Controls } from './components/Controls';
+import { ExportHost } from './components/ExportHost';
 import { MemberForm } from './components/MemberForm';
 import { TeamColumn } from './components/TeamColumn';
+import { TeamExportCard } from './components/TeamExportCard';
 import { UnassignedPool } from './components/UnassignedPool';
 import { UNASSIGNED_ID } from './constants';
 import { loadData, saveData } from './storage';
 import { GlobalStyle } from './styles/GlobalStyle';
 import { theme } from './styles/theme';
-import type { Member } from './types';
+import type { Member, SkillLevel } from './types';
 import { createSortableCollisionDetection } from './utils/collision';
+import { downloadNodesAsImages } from './utils/exportImage';
 import {
   findContainerId,
   flattenGroups,
@@ -41,7 +44,7 @@ const fadeUp = keyframes`
 const Page = styled.div`
   position: relative;
   min-height: 100vh;
-  overflow: hidden;
+  overflow-x: hidden;
   background:
     radial-gradient(ellipse 80% 50% at 10% -10%, rgba(225, 6, 0, 0.18), transparent 55%),
     radial-gradient(ellipse 60% 40% at 90% 0%, rgba(225, 6, 0, 0.08), transparent 50%),
@@ -58,6 +61,12 @@ const Shell = styled.main`
   flex-direction: column;
   gap: 1.25rem;
   animation: ${fadeUp} 0.55s ease backwards;
+
+  @media (max-width: 860px) {
+    width: min(1180px, calc(100% - 1.25rem));
+    padding: 1.25rem 0 2.5rem;
+    gap: 0.9rem;
+  }
 `;
 
 const Brand = styled.header`
@@ -70,7 +79,7 @@ const Brand = styled.header`
 const BrandMark = styled.p`
   margin: 0;
   font-family: ${({ theme }) => theme.fonts.display};
-  font-size: clamp(3rem, 8vw, 4.75rem);
+  font-size: clamp(2.6rem, 10vw, 4.75rem);
   line-height: 0.9;
   letter-spacing: 0.08em;
   color: ${({ theme }) => theme.colors.white};
@@ -83,8 +92,9 @@ const BrandMark = styled.p`
 const Tagline = styled.p`
   margin: 0;
   color: ${({ theme }) => theme.colors.textMuted};
-  font-size: 1rem;
-  max-width: 36ch;
+  font-size: 0.95rem;
+  max-width: 40ch;
+  line-height: 1.45;
 `;
 
 const Panel = styled.section`
@@ -148,13 +158,15 @@ const measuring = {
 
 function App() {
   const [data, setData] = useState(() => loadData());
-  const [editingMember, setEditingMember] = useState<Member | null>(null);
   const [activeMember, setActiveMember] = useState<Member | null>(null);
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
+  const [isExporting, setIsExporting] = useState(false);
+  const exportHostRef = useRef<HTMLDivElement>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
-      activationConstraint: { distance: 6 },
+      // 핸들에서만 리스너를 쓰므로, 짧은 이동 후에만 드래그 시작
+      activationConstraint: { distance: 8 },
     }),
   );
 
@@ -198,24 +210,25 @@ function App() {
     [containerIds, groups, activeId],
   );
 
-  const handleSubmitMember = (name: string) => {
-    if (editingMember) {
-      setData((prev) => ({
-        ...prev,
-        members: prev.members.map((member) =>
-          member.id === editingMember.id ? { ...member, name } : member,
-        ),
-      }));
-      setEditingMember(null);
-      return;
-    }
-
+  const handleAddMember = (name: string, skill: SkillLevel) => {
     setData((prev) => ({
       ...prev,
       members: [
         ...prev.members,
-        { id: createId(), name, teamId: null },
+        { id: createId(), name, skill, teamId: null },
       ],
+    }));
+  };
+
+  const handleUpdateMember = (
+    id: string,
+    patch: { name: string; skill: SkillLevel },
+  ) => {
+    setData((prev) => ({
+      ...prev,
+      members: prev.members.map((member) =>
+        member.id === id ? { ...member, ...patch } : member,
+      ),
     }));
   };
 
@@ -224,7 +237,6 @@ function App() {
       ...prev,
       members: prev.members.filter((member) => member.id !== id),
     }));
-    if (editingMember?.id === id) setEditingMember(null);
   };
 
   const handleTeamCountChange = (count: number) => {
@@ -253,6 +265,40 @@ function App() {
       ...prev,
       members: prev.members.map((member) => ({ ...member, teamId: null })),
     }));
+  };
+
+  const handleExportImage = async () => {
+    if (!exportHostRef.current || isExporting) return;
+
+    const nodes = Array.from(
+      exportHostRef.current.querySelectorAll<HTMLElement>('[data-export-team]'),
+    );
+
+    if (nodes.length === 0) {
+      window.alert('저장할 조가 없습니다.');
+      return;
+    }
+
+    setIsExporting(true);
+    try {
+      const stamp = new Date().toISOString().slice(0, 10);
+      const items = nodes.map((node) => {
+        const teamId = node.dataset.exportTeam ?? 'team';
+        const team = data.teams.find((item) => item.id === teamId);
+        const label = team?.name ?? teamId;
+        return {
+          node,
+          filename: `${label}-${stamp}.png`,
+        };
+      });
+
+      await downloadNodesAsImages(items);
+    } catch (error) {
+      console.error(error);
+      window.alert('이미지 저장에 실패했습니다. 잠시 후 다시 시도해주세요.');
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -332,25 +378,23 @@ function App() {
               TEAM<span>MAKER</span>
             </BrandMark>
             <Tagline>
-              팀원을 추가하고, 드래그로 조를 편성하거나 랜덤으로 나눠보세요.
+              실력을 정해 팀원을 추가하면, 밸런스 랜덤 조짜기로 고르게 나눌 수 있어요.
             </Tagline>
           </Brand>
 
           <Panel>
-            <PanelTitle>팀원 관리</PanelTitle>
-            <MemberForm
-              editingMember={editingMember}
-              onSubmit={handleSubmitMember}
-              onCancelEdit={() => setEditingMember(null)}
-            />
+            <PanelTitle>팀원 추가</PanelTitle>
+            <MemberForm onSubmit={handleAddMember} />
           </Panel>
 
           <Controls
             teamCount={data.teams.length}
             memberCount={data.members.length}
+            isExporting={isExporting}
             onTeamCountChange={handleTeamCountChange}
             onRandomAssign={handleRandomAssign}
             onClearAssignments={handleClearAssignments}
+            onExportImage={handleExportImage}
           />
 
           <DndContext
@@ -371,7 +415,7 @@ function App() {
             <Board>
               <UnassignedPool
                 members={unassigned}
-                onEdit={setEditingMember}
+                onUpdate={handleUpdateMember}
                 onDelete={handleDeleteMember}
               />
               <TeamGrid>
@@ -380,7 +424,7 @@ function App() {
                     key={team.id}
                     team={team}
                     members={membersByTeam.get(team.id) ?? []}
-                    onEdit={setEditingMember}
+                    onUpdate={handleUpdateMember}
                     onDelete={handleDeleteMember}
                   />
                 ))}
@@ -391,6 +435,18 @@ function App() {
               {activeMember ? <OverlayCard>{activeMember.name}</OverlayCard> : null}
             </DragOverlay>
           </DndContext>
+
+          <ExportHost>
+            <div ref={exportHostRef}>
+              {data.teams.map((team) => (
+                <TeamExportCard
+                  key={team.id}
+                  team={team}
+                  members={membersByTeam.get(team.id) ?? []}
+                />
+              ))}
+            </div>
+          </ExportHost>
         </Shell>
       </Page>
     </ThemeProvider>

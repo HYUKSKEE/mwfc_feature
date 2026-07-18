@@ -1,7 +1,9 @@
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import styled from 'styled-components';
+import { getSkillLabel } from '../constants/skill';
 import { UNASSIGNED_ID } from '../constants';
-import type { Member } from '../types';
+import type { Member, SkillLevel } from '../types';
+import { CopyListButton } from './CopyListButton';
 import { DropZone } from './DropZone';
 import { MemberCard } from './MemberCard';
 
@@ -9,7 +11,7 @@ export { UNASSIGNED_ID };
 
 type Props = {
   members: Member[];
-  onEdit: (member: Member) => void;
+  onUpdate: (id: string, patch: { name: string; skill: SkillLevel }) => void;
   onDelete: (id: string) => void;
 };
 
@@ -24,6 +26,12 @@ const Panel = styled.section`
 `;
 
 const Header = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+`;
+
+const TitleRow = styled.div`
   display: flex;
   align-items: baseline;
   justify-content: space-between;
@@ -43,14 +51,28 @@ const Count = styled.span`
   font-size: 0.85rem;
 `;
 
-export function UnassignedPool({ members, onEdit, onDelete }: Props) {
+const Actions = styled.div`
+  display: flex;
+  justify-content: flex-end;
+`;
+
+export function UnassignedPool({ members, onUpdate, onDelete }: Props) {
   const itemIds = members.map((member) => member.id);
+  const copyMembers = members.map((member) => ({
+    name: member.name,
+    skillLabel: getSkillLabel(member.skill),
+  }));
 
   return (
     <Panel>
       <Header>
-        <Title>대기 인원</Title>
-        <Count>{members.length}명</Count>
+        <TitleRow>
+          <Title>대기 인원</Title>
+          <Count>{members.length}명</Count>
+        </TitleRow>
+        <Actions>
+          <CopyListButton title="대기 인원" members={copyMembers} />
+        </Actions>
       </Header>
       <DropZone
         id={UNASSIGNED_ID}
@@ -62,7 +84,7 @@ export function UnassignedPool({ members, onEdit, onDelete }: Props) {
             <MemberCard
               key={member.id}
               member={member}
-              onEdit={onEdit}
+              onUpdate={onUpdate}
               onDelete={onDelete}
             />
           ))}
