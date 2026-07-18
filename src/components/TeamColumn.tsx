@@ -1,6 +1,5 @@
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import styled from 'styled-components';
-import { getSkillLabel } from '../constants/skill';
 import type { Member, SkillLevel, Team } from '../types';
 import { CopyListButton } from './CopyListButton';
 import { DropZone } from './DropZone';
@@ -62,7 +61,6 @@ export function TeamColumn({ team, members, onUpdate, onDelete }: Props) {
   const skillTotal = members.reduce((sum, member) => sum + member.skill, 0);
   const copyMembers = members.map((member) => ({
     name: member.name,
-    skillLabel: getSkillLabel(member.skill),
   }));
 
   return (

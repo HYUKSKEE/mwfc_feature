@@ -1,6 +1,5 @@
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import styled from 'styled-components';
-import { getSkillLabel } from '../constants/skill';
 import { UNASSIGNED_ID } from '../constants';
 import type { Member, SkillLevel } from '../types';
 import { CopyListButton } from './CopyListButton';
@@ -60,7 +59,6 @@ export function UnassignedPool({ members, onUpdate, onDelete }: Props) {
   const itemIds = members.map((member) => member.id);
   const copyMembers = members.map((member) => ({
     name: member.name,
-    skillLabel: getSkillLabel(member.skill),
   }));
 
   return (
