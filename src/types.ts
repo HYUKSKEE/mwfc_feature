@@ -1,4 +1,4 @@
-export type SkillLevel = 1 | 2 | 3 | 4 | 5;
+export type SkillLevel = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
 export type Member = {
   id: string;

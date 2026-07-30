@@ -1,4 +1,4 @@
-import { normalizeSkill } from '../constants/skill';
+import { MAX_SKILL, MIN_SKILL, normalizeSkill } from '../constants/skill';
 import type { Member, Team } from '../types';
 
 function shuffle<T>(items: T[]): T[] {
@@ -22,7 +22,7 @@ function orderMembersForBalance(members: Member[]): Member[] {
   }
 
   const ordered: Member[] = [];
-  for (let skill = 5; skill >= 1; skill -= 1) {
+  for (let skill = MAX_SKILL; skill >= MIN_SKILL; skill -= 1) {
     ordered.push(...shuffle(buckets.get(skill) ?? []));
   }
   return ordered;

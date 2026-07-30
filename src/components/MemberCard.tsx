@@ -4,6 +4,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import styled from 'styled-components';
 import { getSkillLabel, SKILL_OPTIONS } from '../constants/skill';
+import { skillBadgeTone } from '../styles/mixins';
 import type { Member, SkillLevel } from '../types';
 
 type Props = {
@@ -96,13 +97,7 @@ const SkillBadge = styled.span<{ $level: SkillLevel }>`
   align-self: flex-start;
   padding: 0.1rem 0.4rem;
   border-radius: 999px;
-  border: 1px solid
-    ${({ theme, $level }) =>
-      $level >= 4 ? theme.colors.accent : theme.colors.border};
-  background: ${({ theme, $level }) =>
-      $level >= 4 ? theme.colors.accentSoft : theme.colors.bg};
-  color: ${({ theme, $level }) =>
-    $level >= 4 ? theme.colors.accent : theme.colors.textMuted};
+  ${skillBadgeTone}
   font-size: 0.72rem;
   font-weight: 600;
   letter-spacing: 0.02em;
