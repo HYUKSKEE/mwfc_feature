@@ -10,6 +10,7 @@ import {
 import type { DragEndEvent, UniqueIdentifier } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
 import styled, { ThemeProvider, keyframes } from 'styled-components';
+import { BatchImportModal } from './components/BatchImportModal';
 import { Controls } from './components/Controls';
 import { ExportHost } from './components/ExportHost';
 import { MemberForm } from './components/MemberForm';
@@ -105,12 +106,38 @@ const Panel = styled.section`
   animation: ${fadeUp} 0.55s ease 0.08s backwards;
 `;
 
+const PanelHeader = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+  margin-bottom: 0.85rem;
+`;
+
 const PanelTitle = styled.h2`
-  margin: 0 0 0.85rem;
+  margin: 0;
   font-family: ${({ theme }) => theme.fonts.display};
   font-size: 1.5rem;
   letter-spacing: 0.05em;
   font-weight: 400;
+`;
+
+const GhostButton = styled.button`
+  min-height: 36px;
+  padding: 0.45rem 0.8rem;
+  border-radius: ${({ theme }) => theme.radii.md};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  background: transparent;
+  color: ${({ theme }) => theme.colors.text};
+  font-weight: 600;
+  font-size: 0.88rem;
+
+  &:hover {
+    border-color: ${({ theme }) => theme.colors.accent};
+    color: ${({ theme }) => theme.colors.accent};
+    background: ${({ theme }) => theme.colors.accentSoft};
+  }
 `;
 
 const Board = styled.div`
@@ -161,6 +188,7 @@ function App() {
   const [activeMember, setActiveMember] = useState<Member | null>(null);
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
   const [isExporting, setIsExporting] = useState(false);
+  const [batchImportOpen, setBatchImportOpen] = useState(false);
   const exportHostRef = useRef<HTMLDivElement>(null);
 
   const sensors = useSensors(
@@ -216,6 +244,21 @@ function App() {
       members: [
         ...prev.members,
         { id: createId(), name, skill, teamId: null },
+      ],
+    }));
+  };
+
+  const handleBatchAddMembers = (names: string[], skill: SkillLevel) => {
+    setData((prev) => ({
+      ...prev,
+      members: [
+        ...prev.members,
+        ...names.map((name) => ({
+          id: createId(),
+          name,
+          skill,
+          teamId: null,
+        })),
       ],
     }));
   };
@@ -383,9 +426,24 @@ function App() {
           </Brand>
 
           <Panel>
-            <PanelTitle>팀원 추가</PanelTitle>
+            <PanelHeader>
+              <PanelTitle>팀원 추가</PanelTitle>
+              <GhostButton
+                type="button"
+                onClick={() => setBatchImportOpen(true)}
+              >
+                명단 이미지로 일괄 등록
+              </GhostButton>
+            </PanelHeader>
             <MemberForm onSubmit={handleAddMember} />
           </Panel>
+
+          <BatchImportModal
+            open={batchImportOpen}
+            existingNames={data.members.map((member) => member.name)}
+            onClose={() => setBatchImportOpen(false)}
+            onConfirm={handleBatchAddMembers}
+          />
 
           <Controls
             teamCount={data.teams.length}
