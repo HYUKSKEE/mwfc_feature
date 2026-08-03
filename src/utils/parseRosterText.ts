@@ -1,3 +1,23 @@
+/** 사용자가 직접 입력한 콤마/띄어쓰기/줄바꿈 구분 명단을 파싱합니다. */
+export function parseTypedNames(raw: string): string[] {
+  const chunks = raw
+    .split(/[\n\r,，、\s]+/)
+    .map((chunk) => chunk.trim())
+    .filter(Boolean);
+
+  const unique: string[] = [];
+  const seen = new Set<string>();
+
+  for (const name of chunks) {
+    const key = name.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    unique.push(name);
+  }
+
+  return unique;
+}
+
 /** OCR/텍스트 명단에서 선수 이름 후보를 뽑습니다. */
 export function parseRosterText(raw: string): string[] {
   const chunks = raw
