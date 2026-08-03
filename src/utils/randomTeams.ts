@@ -1,5 +1,5 @@
 import { MAX_SKILL, MIN_SKILL, normalizeSkill } from '../constants/skill';
-import type { Member, SkillLevel, Team } from '../types';
+import type { Member, Team } from '../types';
 
 function shuffle<T>(items: T[]): T[] {
   const result = [...items];
@@ -8,11 +8,6 @@ function shuffle<T>(items: T[]): T[] {
     [result[i], result[j]] = [result[j], result[i]];
   }
   return result;
-}
-
-/** 최하(0)도 합산에 반영되도록 +1 가중치를 사용합니다. */
-function skillWeight(skill: SkillLevel): number {
-  return normalizeSkill(skill) + 1;
 }
 
 /** 같은 실력끼리 섞은 뒤, 높은 실력부터 배치 순서를 만듭니다. */
@@ -35,7 +30,7 @@ function orderMembersForBalance(members: Member[]): Member[] {
 
 /**
  * 인원 수를 먼저 균등하게 맞추고, 그다음 실력 합을 고르게 맞춥니다.
- * 강한 인원부터 배치합니다.
+ * 강한 인원부터 배치합니다. 실력 값은 1~7을 그대로 합산에 사용합니다.
  */
 export function assignRandomTeams(members: Member[], teams: Team[]): Member[] {
   if (teams.length === 0) {
@@ -79,13 +74,12 @@ export function assignRandomTeams(members: Member[], teams: Team[]): Member[] {
       }
     }
 
-    // 모든 팀이 max인 경우 폴백 (이론상 거의 없음)
     if (bestIndex < 0) {
       bestIndex = counts.indexOf(Math.min(...counts));
     }
 
     assignedTeamIndex.set(member.id, bestIndex);
-    totals[bestIndex] += skillWeight(member.skill);
+    totals[bestIndex] += normalizeSkill(member.skill);
     counts[bestIndex] += 1;
   }
 

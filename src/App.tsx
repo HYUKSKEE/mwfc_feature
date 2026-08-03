@@ -287,6 +287,7 @@ function App() {
     const teamIds = new Set(teams.map((team) => team.id));
 
     setData((prev) => ({
+      ...prev,
       teams,
       members: prev.members.map((member) =>
         member.teamId && teamIds.has(member.teamId)

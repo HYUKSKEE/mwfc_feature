@@ -1,4 +1,4 @@
-export type SkillLevel = 0 | 1 | 2 | 3 | 4 | 5 | 6;
+export type SkillLevel = 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
 export type Member = {
   id: string;
@@ -13,6 +13,7 @@ export type Team = {
 };
 
 export type AppData = {
+  version: number;
   members: Member[];
   teams: Team[];
 };
