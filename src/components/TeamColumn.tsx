@@ -8,8 +8,11 @@ import { MemberCard } from './MemberCard';
 type Props = {
   team: Team;
   members: Member[];
+  exportDisabled?: boolean;
+  isSavingImage?: boolean;
   onUpdate: (id: string, patch: { name: string; skill: SkillLevel }) => void;
   onDelete: (id: string) => void;
+  onExportImage: (teamId: string) => void;
 };
 
 const Column = styled.section`
@@ -53,10 +56,43 @@ const Count = styled.span`
 
 const Actions = styled.div`
   display: flex;
+  flex-wrap: wrap;
   justify-content: flex-end;
+  gap: 0.4rem;
 `;
 
-export function TeamColumn({ team, members, onUpdate, onDelete }: Props) {
+const ExportButton = styled.button`
+  min-height: 30px;
+  padding: 0.3rem 0.65rem;
+  border-radius: ${({ theme }) => theme.radii.sm};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  background: transparent;
+  color: ${({ theme }) => theme.colors.textMuted};
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+
+  &:hover:not(:disabled) {
+    color: ${({ theme }) => theme.colors.text};
+    border-color: ${({ theme }) => theme.colors.borderStrong};
+    background: ${({ theme }) => theme.colors.bgHover};
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+`;
+
+export function TeamColumn({
+  team,
+  members,
+  exportDisabled = false,
+  isSavingImage = false,
+  onUpdate,
+  onDelete,
+  onExportImage,
+}: Props) {
   const itemIds = members.map((member) => member.id);
   const skillTotal = members.reduce((sum, member) => sum + member.skill, 0);
   const copyMembers = members.map((member) => ({
@@ -74,6 +110,14 @@ export function TeamColumn({ team, members, onUpdate, onDelete }: Props) {
         </TitleRow>
         <Actions>
           <CopyListButton title={team.name} members={copyMembers} />
+          <ExportButton
+            type="button"
+            disabled={members.length === 0 || exportDisabled}
+            onClick={() => onExportImage(team.id)}
+            aria-label={`${team.name} 이미지 저장`}
+          >
+            {isSavingImage ? '저장 중...' : '이미지 저장'}
+          </ExportButton>
         </Actions>
       </Header>
       <DropZone

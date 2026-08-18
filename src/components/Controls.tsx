@@ -7,7 +7,6 @@ type Props = {
   onTeamCountChange: (count: number) => void;
   onRandomAssign: () => void;
   onClearAssignments: () => void;
-  onExportImage: () => void;
 };
 
 const Bar = styled.div`
@@ -93,7 +92,6 @@ export function Controls({
   onTeamCountChange,
   onRandomAssign,
   onClearAssignments,
-  onExportImage,
 }: Props) {
   return (
     <Bar>
@@ -119,14 +117,6 @@ export function Controls({
         disabled={memberCount === 0 || isExporting}
       >
         배정 초기화
-      </Button>
-      <Button
-        type="button"
-        $variant="ghost"
-        onClick={onExportImage}
-        disabled={memberCount === 0 || isExporting}
-      >
-        {isExporting ? '저장 중...' : '조별 이미지 저장/공유'}
       </Button>
       <Button
         type="button"

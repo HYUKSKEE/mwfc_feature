@@ -24,7 +24,7 @@ import { GlobalStyle } from './styles/GlobalStyle';
 import { theme } from './styles/theme';
 import type { Member, SkillLevel } from './types';
 import { createSortableCollisionDetection } from './utils/collision';
-import { downloadNodesAsImages } from './utils/exportImage';
+import { downloadNodeAsImage } from './utils/exportImage';
 import {
   findContainerId,
   flattenGroups,
@@ -196,6 +196,7 @@ function App() {
   const [activeMember, setActiveMember] = useState<Member | null>(null);
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
   const [isExporting, setIsExporting] = useState(false);
+  const [exportingTeamId, setExportingTeamId] = useState<string | null>(null);
   const [batchImportOpen, setBatchImportOpen] = useState(false);
   const exportHostRef = useRef<HTMLDivElement>(null);
 
@@ -319,37 +320,37 @@ function App() {
     }));
   };
 
-  const handleExportImage = async () => {
+  const handleExportTeamImage = async (teamId: string) => {
     if (!exportHostRef.current || isExporting) return;
 
-    const nodes = Array.from(
-      exportHostRef.current.querySelectorAll<HTMLElement>('[data-export-team]'),
+    const node = exportHostRef.current.querySelector<HTMLElement>(
+      `[data-export-team="${teamId}"]`,
     );
+    const team = data.teams.find((item) => item.id === teamId);
 
-    if (nodes.length === 0) {
-      window.alert('저장할 조가 없습니다.');
+    if (!node || !team) {
+      window.alert('저장할 조를 찾지 못했습니다.');
+      return;
+    }
+
+    const memberCount = data.members.filter((member) => member.teamId === teamId)
+      .length;
+    if (memberCount === 0) {
+      window.alert('배정된 인원이 없습니다.');
       return;
     }
 
     setIsExporting(true);
+    setExportingTeamId(teamId);
     try {
       const stamp = new Date().toISOString().slice(0, 10);
-      const items = nodes.map((node) => {
-        const teamId = node.dataset.exportTeam ?? 'team';
-        const team = data.teams.find((item) => item.id === teamId);
-        const label = team?.name ?? teamId;
-        return {
-          node,
-          filename: `${label}-${stamp}.png`,
-        };
-      });
-
-      await downloadNodesAsImages(items);
+      await downloadNodeAsImage(node, `${team.name}-${stamp}.png`);
     } catch (error) {
       console.error(error);
       window.alert('이미지 저장에 실패했습니다. 잠시 후 다시 시도해주세요.');
     } finally {
       setIsExporting(false);
+      setExportingTeamId(null);
     }
   };
 
@@ -466,7 +467,6 @@ function App() {
             onTeamCountChange={handleTeamCountChange}
             onRandomAssign={handleRandomAssign}
             onClearAssignments={handleClearAssignments}
-            onExportImage={handleExportImage}
           />
 
           <DndContext
@@ -496,8 +496,11 @@ function App() {
                     key={team.id}
                     team={team}
                     members={membersByTeam.get(team.id) ?? []}
+                    exportDisabled={isExporting}
+                    isSavingImage={exportingTeamId === team.id}
                     onUpdate={handleUpdateMember}
                     onDelete={handleDeleteMember}
+                    onExportImage={handleExportTeamImage}
                   />
                 ))}
               </TeamGrid>
