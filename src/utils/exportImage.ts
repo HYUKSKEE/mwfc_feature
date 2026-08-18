@@ -1,16 +1,15 @@
+import { saveAs } from 'file-saver';
 import { toPng } from 'html-to-image';
 
-export function downloadDataUrl(dataUrl: string, filename: string) {
-  const link = document.createElement('a');
-  link.download = filename;
-  link.href = dataUrl;
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-}
-
-function wait(ms: number) {
-  return new Promise((resolve) => window.setTimeout(resolve, ms));
+function dataUrlToBlob(dataUrl: string): Blob {
+  const [header, data] = dataUrl.split(',');
+  const mime = header.match(/data:(.*?);/)?.[1] ?? 'image/png';
+  const binary = atob(data);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i += 1) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return new Blob([bytes], { type: mime });
 }
 
 export async function captureNodeAsPng(node: HTMLElement): Promise<string> {
@@ -28,26 +27,11 @@ export async function captureNodeAsPng(node: HTMLElement): Promise<string> {
   });
 }
 
-/** 조별 이미지를 순서대로 바로 다운로드합니다. (공유 시트 없이 저장) */
-export async function downloadNodesAsImages(
-  items: Array<{ node: HTMLElement; filename: string }>,
-): Promise<void> {
-  for (let index = 0; index < items.length; index += 1) {
-    const { node, filename } = items[index];
-    const dataUrl = await captureNodeAsPng(node);
-    downloadDataUrl(dataUrl, filename);
-
-    // 브라우저가 연속 다운로드를 막지 않도록 짧게 대기
-    if (index < items.length - 1) {
-      await wait(250);
-    }
-  }
-}
-
 /** 단일 노드 이미지를 다운로드합니다. */
 export async function downloadNodeAsImage(
   node: HTMLElement,
   filename: string,
 ): Promise<void> {
-  await downloadNodesAsImages([{ node, filename }]);
+  const dataUrl = await captureNodeAsPng(node);
+  saveAs(dataUrlToBlob(dataUrl), filename);
 }
