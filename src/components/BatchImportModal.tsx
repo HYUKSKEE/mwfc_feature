@@ -381,7 +381,7 @@ export function BatchImportModal({
   const applyTypedNames = useCallback(() => {
     const names = parseTypedNames(typedText);
     if (names.length === 0) {
-      setError('콤마 또는 띄어쓰기로 이름을 입력해주세요. 예: 김철수 이영희');
+      setError('줄바꿈·콤마·띄어쓰기로 이름을 입력해주세요.');
       return;
     }
 
@@ -494,15 +494,15 @@ export function BatchImportModal({
         {step === 'upload' && (
           <>
             <Hint>
-              이름을 콤마나 띄어쓰기로 구분해 직접 입력하거나, 명단 이미지로 OCR
-              등록할 수 있습니다.
+              복사한 명단을 붙여넣거나, 콤마·띄어쓰기·줄바꿈으로 이름을 입력할 수
+              있습니다. 이미지 OCR도 가능합니다.
             </Hint>
 
             <TextArea
               value={typedText}
               disabled={busy}
-              placeholder="예: 김철수 이영희 박민수 또는 김철수, 이영희"
-              aria-label="콤마 또는 띄어쓰기로 구분한 이름 목록"
+              placeholder={'예:\n김철수\n이영희\n박민수'}
+              aria-label="줄바꿈·콤마·띄어쓰기로 구분한 이름 목록"
               onChange={(event) => {
                 setTypedText(event.target.value);
                 if (error) setError('');

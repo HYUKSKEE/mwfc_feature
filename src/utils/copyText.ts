@@ -25,14 +25,20 @@ export async function copyText(text: string): Promise<boolean> {
   }
 }
 
+/** 팀/대기열 리스트 복사 — 제목 다음 줄부터 이름 한 줄씩 */
 export function formatMemberList(
   title: string,
   members: Array<{ name: string; skillLabel?: string }>,
 ): string {
   if (members.length === 0) {
-    return `${title}: (인원 없음)`;
+    return `${title}:\n(인원 없음)`;
   }
 
-  const names = members.map((member) => member.name).join(', ');
-  return `${title}: ${names}`;
+  const names = members.map((member) => member.name).join('\n');
+  return `${title}:\n${names}`;
+}
+
+/** 전체 명단 공유용 — 이름만 줄바꿈으로 연결 */
+export function formatRosterNames(names: string[]): string {
+  return names.map((name) => name.trim()).filter(Boolean).join('\n');
 }

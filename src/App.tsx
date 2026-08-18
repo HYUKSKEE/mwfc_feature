@@ -11,6 +11,7 @@ import type { DragEndEvent, UniqueIdentifier } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
 import styled, { ThemeProvider, keyframes } from 'styled-components';
 import { BatchImportModal } from './components/BatchImportModal';
+import { CopyRosterButton } from './components/CopyRosterButton';
 import { Controls } from './components/Controls';
 import { ExportHost } from './components/ExportHost';
 import { MemberForm } from './components/MemberForm';
@@ -121,6 +122,13 @@ const PanelTitle = styled.h2`
   font-size: 1.5rem;
   letter-spacing: 0.05em;
   font-weight: 400;
+`;
+
+const PanelActions = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
 `;
 
 const GhostButton = styled.button`
@@ -429,12 +437,17 @@ function App() {
           <Panel>
             <PanelHeader>
               <PanelTitle>팀원 추가</PanelTitle>
-              <GhostButton
-                type="button"
-                onClick={() => setBatchImportOpen(true)}
-              >
-                명단 이미지로 일괄 등록
-              </GhostButton>
+              <PanelActions>
+                <CopyRosterButton
+                  names={data.members.map((member) => member.name)}
+                />
+                <GhostButton
+                  type="button"
+                  onClick={() => setBatchImportOpen(true)}
+                >
+                  일괄 등록
+                </GhostButton>
+              </PanelActions>
             </PanelHeader>
             <MemberForm onSubmit={handleAddMember} />
           </Panel>
