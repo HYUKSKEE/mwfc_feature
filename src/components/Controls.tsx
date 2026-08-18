@@ -126,7 +126,7 @@ export function Controls({
         onClick={onExportImage}
         disabled={memberCount === 0 || isExporting}
       >
-        {isExporting ? '저장 중...' : '각 조별 이미지 저장'}
+        {isExporting ? '저장 중...' : '조별 이미지 저장/공유'}
       </Button>
       <Button
         type="button"
