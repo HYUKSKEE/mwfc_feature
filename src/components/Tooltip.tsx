@@ -42,14 +42,15 @@ const Main = styled.span`
   }
 `;
 
-const Anchor = styled.span`
+/** ? 버튼과 말풍선만 담는 클릭 전용 영역 */
+const Tip = styled.span`
   position: relative;
   flex: 0 0 auto;
   display: inline-flex;
   align-items: center;
 `;
 
-const HintButton = styled.button`
+const TipButton = styled.button`
   flex: 0 0 auto;
   display: inline-grid;
   place-items: center;
@@ -65,7 +66,7 @@ const HintButton = styled.button`
   font-size: 0.72rem;
   font-weight: 700;
   line-height: 1;
-  cursor: help;
+  cursor: pointer;
   touch-action: manipulation;
 
   &:hover,
@@ -84,7 +85,6 @@ const HintButton = styled.button`
 `;
 
 const Bubble = styled.span<{
-  $open: boolean;
   $placement: 'left' | 'right';
   $shiftY: number;
 }>`
@@ -109,11 +109,8 @@ const Bubble = styled.span<{
   word-break: keep-all;
   overflow-wrap: anywhere;
   pointer-events: none;
-  opacity: ${({ $open }) => ($open ? 1 : 0)};
-  visibility: ${({ $open }) => ($open ? 'visible' : 'hidden')};
   top: 50%;
   transform: translateY(calc(-50% + ${({ $shiftY }) => $shiftY}px));
-  transition: opacity 0.12s ease, visibility 0.12s ease;
 
   ${({ $placement }) =>
     $placement === 'right'
@@ -153,31 +150,37 @@ function fitBeside(
   return { placement, shiftY };
 }
 
-/** ? 아이콘 옆 12px 간격으로 한·영 설명을 보여줍니다. */
+/** ? 아이콘을 눌렀을 때만 한·영 설명을 보여줍니다. */
 export function Tooltip({ text, textEn, children, className }: Props) {
   const tipId = useId();
-  const wrapRef = useRef<HTMLSpanElement>(null);
-  const anchorRef = useRef<HTMLSpanElement>(null);
+  const tipRef = useRef<HTMLSpanElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
   const bubbleRef = useRef<HTMLSpanElement>(null);
-  const [hovered, setHovered] = useState(false);
-  const [pinned, setPinned] = useState(false);
+  const [open, setOpen] = useState(false);
   const [placement, setPlacement] = useState<'left' | 'right'>('right');
   const [shiftY, setShiftY] = useState(0);
-  const open = hovered || pinned;
 
   useEffect(() => {
-    if (!pinned) return;
+    if (!open) return;
 
     const onPointerDown = (event: PointerEvent) => {
       const target = event.target as Node | null;
-      if (wrapRef.current && target && !wrapRef.current.contains(target)) {
-        setPinned(false);
+      if (tipRef.current && target && !tipRef.current.contains(target)) {
+        setOpen(false);
       }
     };
 
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setOpen(false);
+    };
+
     document.addEventListener('pointerdown', onPointerDown);
-    return () => document.removeEventListener('pointerdown', onPointerDown);
-  }, [pinned]);
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.removeEventListener('pointerdown', onPointerDown);
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  }, [open]);
 
   useLayoutEffect(() => {
     if (!open) {
@@ -187,12 +190,12 @@ export function Tooltip({ text, textEn, children, className }: Props) {
     }
 
     const update = () => {
-      const anchorEl = anchorRef.current;
+      const buttonEl = buttonRef.current;
       const bubbleEl = bubbleRef.current;
-      if (!anchorEl || !bubbleEl) return;
+      if (!buttonEl || !bubbleEl) return;
 
       const next = fitBeside(
-        anchorEl.getBoundingClientRect(),
+        buttonEl.getBoundingClientRect(),
         bubbleEl.getBoundingClientRect(),
       );
       setPlacement(next.placement);
@@ -212,39 +215,36 @@ export function Tooltip({ text, textEn, children, className }: Props) {
   }, [open, text, textEn]);
 
   return (
-    <Wrap
-      ref={wrapRef}
-      className={className}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-    >
+    <Wrap className={className}>
       <Main>{children}</Main>
-      <Anchor ref={anchorRef}>
-        <HintButton
+      <Tip ref={tipRef}>
+        <TipButton
+          ref={buttonRef}
           type="button"
           aria-label="기능 설명"
           aria-expanded={open}
-          aria-describedby={open ? tipId : undefined}
+          aria-controls={open ? tipId : undefined}
           onClick={(event) => {
             event.preventDefault();
             event.stopPropagation();
-            setPinned((prev) => !prev);
+            setOpen((prev) => !prev);
           }}
         >
           ?
-        </HintButton>
-        <Bubble
-          ref={bubbleRef}
-          id={tipId}
-          role="tooltip"
-          $open={open}
-          $placement={placement}
-          $shiftY={shiftY}
-        >
-          <strong>{text}</strong>
-          {textEn ? <em>{textEn}</em> : null}
-        </Bubble>
-      </Anchor>
+        </TipButton>
+        {open ? (
+          <Bubble
+            ref={bubbleRef}
+            id={tipId}
+            role="tooltip"
+            $placement={placement}
+            $shiftY={shiftY}
+          >
+            <strong>{text}</strong>
+            {textEn ? <em>{textEn}</em> : null}
+          </Bubble>
+        ) : null}
+      </Tip>
     </Wrap>
   );
 }
