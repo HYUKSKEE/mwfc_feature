@@ -10,6 +10,8 @@ type Props = {
 
 const Button = styled.button<{ $copied: boolean }>`
   min-height: 36px;
+  min-width: 0;
+  max-width: 100%;
   padding: 0.45rem 0.8rem;
   border-radius: ${({ theme }) => theme.radii.md};
   border: 1px solid
@@ -20,6 +22,9 @@ const Button = styled.button<{ $copied: boolean }>`
     $copied ? theme.colors.accent : theme.colors.text};
   font-weight: 600;
   font-size: 0.88rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 
   &:hover:not(:disabled) {
     border-color: ${({ theme }) => theme.colors.accent};

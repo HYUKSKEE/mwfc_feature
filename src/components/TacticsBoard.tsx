@@ -84,6 +84,8 @@ const Toolbar = styled.div`
 
 const SportButton = styled.button<{ $active: boolean }>`
   min-height: 34px;
+  min-width: 0;
+  max-width: 100%;
   padding: 0.35rem 0.75rem;
   border-radius: ${({ theme }) => theme.radii.sm};
   border: 1px solid
@@ -95,6 +97,9 @@ const SportButton = styled.button<{ $active: boolean }>`
     $active ? theme.colors.accent : theme.colors.textMuted};
   font-size: 0.82rem;
   font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 
   &:hover {
     color: ${({ theme }) => theme.colors.text};
@@ -104,6 +109,8 @@ const SportButton = styled.button<{ $active: boolean }>`
 
 const GhostButton = styled.button`
   min-height: 34px;
+  min-width: 0;
+  max-width: 100%;
   padding: 0.35rem 0.75rem;
   border-radius: ${({ theme }) => theme.radii.sm};
   border: 1px solid ${({ theme }) => theme.colors.border};
@@ -111,6 +118,9 @@ const GhostButton = styled.button`
   color: ${({ theme }) => theme.colors.textMuted};
   font-size: 0.82rem;
   font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 
   &:hover:not(:disabled) {
     color: ${({ theme }) => theme.colors.text};
@@ -178,6 +188,8 @@ const ChipList = styled.div`
 
 const Chip = styled.button<{ $color: string; $onBoard: boolean }>`
   min-height: 30px;
+  min-width: 0;
+  max-width: 100%;
   padding: 0.25rem 0.55rem;
   border-radius: 999px;
   border: 1px solid
@@ -188,6 +200,9 @@ const Chip = styled.button<{ $color: string; $onBoard: boolean }>`
   font-size: 0.78rem;
   font-weight: 600;
   opacity: ${({ $onBoard }) => ($onBoard ? 0.55 : 1)};
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 
   &:hover:not(:disabled) {
     background: ${({ $color }) => `${$color}44`};

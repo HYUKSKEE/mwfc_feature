@@ -29,6 +29,7 @@ export const GlobalStyle = createGlobalStyle`
 
   button {
     cursor: pointer;
+    max-width: 100%;
   }
 
   ::selection {

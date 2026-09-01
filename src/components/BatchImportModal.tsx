@@ -216,6 +216,8 @@ const Footer = styled.div`
 
 const Button = styled.button<{ $variant?: 'primary' | 'ghost' }>`
   min-height: 42px;
+  min-width: 0;
+  max-width: 100%;
   padding: 0.65rem 1rem;
   border-radius: ${({ theme }) => theme.radii.md};
   border: 1px solid
@@ -225,6 +227,9 @@ const Button = styled.button<{ $variant?: 'primary' | 'ghost' }>`
     $variant === 'ghost' ? 'transparent' : theme.colors.accent};
   color: ${({ theme }) => theme.colors.white};
   font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 
   &:hover:not(:disabled) {
     background: ${({ theme, $variant }) =>

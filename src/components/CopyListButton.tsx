@@ -11,6 +11,8 @@ type Props = {
 
 const Button = styled.button<{ $copied: boolean }>`
   min-height: 30px;
+  min-width: 0;
+  max-width: 100%;
   padding: 0.3rem 0.65rem;
   border-radius: ${({ theme }) => theme.radii.sm};
   border: 1px solid
@@ -21,6 +23,8 @@ const Button = styled.button<{ $copied: boolean }>`
     $copied ? theme.colors.accent : theme.colors.textMuted};
   font-size: 0.8rem;
   font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
   transition:
     color 0.15s ease,

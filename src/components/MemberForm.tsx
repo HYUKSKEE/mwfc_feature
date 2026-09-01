@@ -74,6 +74,8 @@ const Select = styled.select`
 
 const Button = styled.button`
   min-height: 44px;
+  min-width: 0;
+  max-width: 100%;
   padding: 0.8rem 1.15rem;
   border-radius: ${({ theme }) => theme.radii.md};
   border: 1px solid ${({ theme }) => theme.colors.accent};
@@ -81,6 +83,9 @@ const Button = styled.button`
   color: ${({ theme }) => theme.colors.white};
   font-weight: 600;
   letter-spacing: 0.02em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   transition:
     background 0.15s ease,
     border-color 0.15s ease;
