@@ -67,7 +67,7 @@ const DropZone = styled.label<{ $dragging: boolean; $disabled: boolean }>`
   padding: 1rem;
   border: 1px dashed
     ${({ theme, $dragging }) =>
-      $dragging ? theme.colors.accent : theme.colors.borderStrong};
+    $dragging ? theme.colors.accent : theme.colors.borderStrong};
   border-radius: ${({ theme }) => theme.radii.md};
   background: ${({ theme, $dragging }) =>
     $dragging ? theme.colors.accentSoft : theme.colors.bg};
@@ -152,6 +152,10 @@ const Select = styled.select`
   background: ${({ theme }) => theme.colors.bg};
   color: ${({ theme }) => theme.colors.text};
   font-size: 0.95rem;
+
+  @media (max-width: 860px) {
+    min-height: 46px;
+  }
 `;
 
 const List = styled.ul`
@@ -216,7 +220,7 @@ const Button = styled.button<{ $variant?: 'primary' | 'ghost' }>`
   border-radius: ${({ theme }) => theme.radii.md};
   border: 1px solid
     ${({ theme, $variant }) =>
-      $variant === 'ghost' ? theme.colors.border : theme.colors.accent};
+    $variant === 'ghost' ? theme.colors.border : theme.colors.accent};
   background: ${({ theme, $variant }) =>
     $variant === 'ghost' ? 'transparent' : theme.colors.accent};
   color: ${({ theme }) => theme.colors.white};
@@ -224,7 +228,7 @@ const Button = styled.button<{ $variant?: 'primary' | 'ghost' }>`
 
   &:hover:not(:disabled) {
     background: ${({ theme, $variant }) =>
-      $variant === 'ghost' ? theme.colors.bgHover : theme.colors.accentHover};
+    $variant === 'ghost' ? theme.colors.bgHover : theme.colors.accentHover};
   }
 
   &:disabled {
@@ -659,7 +663,7 @@ export function BatchImportModal({
               >
                 {SKILL_OPTIONS.map((option) => (
                   <option key={option.value} value={option.value}>
-                    기본 실력 {option.label}
+                    lv.{option.value}
                   </option>
                 ))}
               </Select>

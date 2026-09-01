@@ -3,7 +3,7 @@ import type { FormEvent, KeyboardEvent } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import styled from 'styled-components';
-import { getSkillLabel, SKILL_OPTIONS } from '../constants/skill';
+import { getSkillDisplay, getSkillLabel, SKILL_OPTIONS } from '../constants/skill';
 import { skillBadgeTone } from '../styles/mixins';
 import type { Member, SkillLevel } from '../types';
 
@@ -15,9 +15,11 @@ type Props = {
 
 const Card = styled.div<{ $dragging: boolean; $editing: boolean }>`
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
+  min-width: 0;
   padding: 0.65rem 0.7rem;
   background: ${({ theme, $dragging }) =>
     $dragging ? 'transparent' : theme.colors.bgElevated};
@@ -68,7 +70,7 @@ const Handle = styled.button`
 
 const Info = styled.div<{ $dragging: boolean }>`
   flex: 1;
-  min-width: 0;
+  min-width: 60px;
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
@@ -76,6 +78,10 @@ const Info = styled.div<{ $dragging: boolean }>`
 `;
 
 const Name = styled.button`
+  display: block;
+  width: 100%;
+  min-width: 60px;
+  max-width: 100%;
   padding: 0;
   border: none;
   background: transparent;
@@ -95,12 +101,19 @@ const Name = styled.button`
 
 const SkillBadge = styled.span<{ $level: SkillLevel }>`
   align-self: flex-start;
-  padding: 0.1rem 0.4rem;
+  padding: 0.15rem 0.45rem;
   border-radius: 999px;
   ${skillBadgeTone}
-  font-size: 0.72rem;
-  font-weight: 600;
+  font-size: 0.8rem;
+  font-weight: 700;
   letter-spacing: 0.02em;
+  line-height: 1.2;
+  white-space: nowrap;
+
+  @media (max-width: 860px) {
+    font-size: 0.9rem;
+    padding: 0.2rem 0.5rem;
+  }
 `;
 
 const EditForm = styled.form`
@@ -124,6 +137,11 @@ const Input = styled.input`
   font-size: 0.95rem;
   outline: none;
   -webkit-appearance: none;
+
+  @media (max-width: 860px) {
+    min-height: 42px;
+    font-size: 1.05rem;
+  }
 `;
 
 const Select = styled.select`
@@ -134,18 +152,30 @@ const Select = styled.select`
   border-radius: ${({ theme }) => theme.radii.sm};
   background: ${({ theme }) => theme.colors.bg};
   color: ${({ theme }) => theme.colors.text};
-  font-size: 0.85rem;
+  font-size: 0.9rem;
+
+  @media (max-width: 860px) {
+    min-height: 42px;
+    font-size: 1.05rem;
+    padding: 0.4rem 0.55rem;
+  }
   outline: none;
 `;
 
 const Actions = styled.div<{ $dragging: boolean }>`
   display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
   gap: 0.3rem;
-  flex-shrink: 0;
+  flex: 0 1 auto;
+  max-width: 100%;
+  min-width: 0;
   visibility: ${({ $dragging }) => ($dragging ? 'hidden' : 'visible')};
 `;
 
 const IconButton = styled.button`
+  flex: 0 0 auto;
   width: 36px;
   height: 36px;
   display: inline-flex;
@@ -297,7 +327,7 @@ export function MemberCard({ member, onUpdate, onDelete }: Props) {
           >
             {SKILL_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
-                {option.label}
+                lv.{option.value}
               </option>
             ))}
           </Select>
@@ -330,8 +360,12 @@ export function MemberCard({ member, onUpdate, onDelete }: Props) {
             >
               {member.name}
             </Name>
-            <SkillBadge $level={member.skill}>
-              {getSkillLabel(member.skill)}
+            <SkillBadge
+              $level={member.skill}
+              title={`실력 ${getSkillLabel(member.skill)}`}
+              aria-label={`실력 ${getSkillLabel(member.skill)}`}
+            >
+              {getSkillDisplay(member.skill)}
             </SkillBadge>
           </Info>
           <Actions $dragging={isDragging}>

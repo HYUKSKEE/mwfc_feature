@@ -54,3 +54,8 @@ export function migrateSkillFromV1(value: unknown): SkillLevel {
 export function getSkillLabel(skill: SkillLevel): string {
   return SKILL_OPTIONS.find((option) => option.value === skill)?.label ?? '중';
 }
+
+/** select / 뱃지용 표시: lv.1 … lv.7 */
+export function getSkillDisplay(skill: SkillLevel): string {
+  return `lv.${normalizeSkill(skill)}`;
+}

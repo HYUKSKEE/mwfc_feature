@@ -44,6 +44,10 @@ const Input = styled.input`
   &:focus {
     border-color: ${({ theme }) => theme.colors.accent};
   }
+
+  @media (max-width: 860px) {
+    min-height: 48px;
+  }
 `;
 
 const Select = styled.select`
@@ -59,6 +63,12 @@ const Select = styled.select`
 
   &:focus {
     border-color: ${({ theme }) => theme.colors.accent};
+  }
+
+  @media (max-width: 860px) {
+    flex: 1 1 140px;
+    min-height: 48px;
+    font-size: 1.1rem;
   }
 `;
 
@@ -129,8 +139,8 @@ export function MemberForm({ onSubmit }: Props) {
         />
       </NameTip>
       <Tooltip
-        text="1(최하)~7(최상) 실력. 밸런스 조짜기에 사용됩니다."
-        textEn="Skill 1 (lowest) to 7 (highest) for balanced teams."
+        text="lv.1(낮음) ~ lv.7(높음). 밸런스 조짜기에 사용됩니다."
+        textEn="lv.1 (low) to lv.7 (high) for balanced teams."
         side="bottom"
       >
         <Select
@@ -140,7 +150,7 @@ export function MemberForm({ onSubmit }: Props) {
         >
           {SKILL_OPTIONS.map((option) => (
             <option key={option.value} value={option.value}>
-              실력 {option.label}
+              lv.{option.value}
             </option>
           ))}
         </Select>

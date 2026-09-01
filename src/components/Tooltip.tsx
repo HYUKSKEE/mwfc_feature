@@ -8,16 +8,18 @@ import {
 } from 'react';
 import styled from 'styled-components';
 
-type Side = 'top' | 'bottom';
+type Side = 'top' | 'bottom' | 'left' | 'right';
 
 type Props = {
   text: string;
   textEn?: string;
   children: ReactNode;
+  /** @deprecated 항상 아이콘 옆(right→left) 12px 간격을 사용합니다. */
   side?: Side;
   className?: string;
 };
 
+const GAP = 12;
 const EDGE = 12;
 
 const Wrap = styled.span`
@@ -38,6 +40,13 @@ const Main = styled.span`
   > * {
     max-width: 100%;
   }
+`;
+
+const Anchor = styled.span`
+  position: relative;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
 `;
 
 const HintButton = styled.button`
@@ -76,11 +85,10 @@ const HintButton = styled.button`
 
 const Bubble = styled.span<{
   $open: boolean;
-  $side: Side;
-  $shiftX: number;
+  $placement: 'left' | 'right';
+  $shiftY: number;
 }>`
   position: absolute;
-  left: 50%;
   z-index: 40;
   box-sizing: border-box;
   width: max-content;
@@ -103,21 +111,14 @@ const Bubble = styled.span<{
   pointer-events: none;
   opacity: ${({ $open }) => ($open ? 1 : 0)};
   visibility: ${({ $open }) => ($open ? 'visible' : 'hidden')};
-  transform: translateX(calc(-50% + ${({ $shiftX }) => $shiftX}px))
-    ${({ $open, $side }) =>
-      $open
-        ? 'translateY(0)'
-        : $side === 'top'
-          ? 'translateY(4px)'
-          : 'translateY(-4px)'};
-  transition:
-    opacity 0.12s ease,
-    visibility 0.12s ease;
+  top: 50%;
+  transform: translateY(calc(-50% + ${({ $shiftY }) => $shiftY}px));
+  transition: opacity 0.12s ease, visibility 0.12s ease;
 
-  ${({ $side }) =>
-    $side === 'top'
-      ? 'bottom: calc(100% + 8px); top: auto;'
-      : 'top: calc(100% + 8px); bottom: auto;'}
+  ${({ $placement }) =>
+    $placement === 'right'
+      ? `left: calc(100% + ${GAP}px); right: auto;`
+      : `right: calc(100% + ${GAP}px); left: auto;`}
 
   strong {
     display: block;
@@ -134,47 +135,34 @@ const Bubble = styled.span<{
   }
 `;
 
-function fitPlacement(
-  wrap: DOMRect,
+function fitBeside(
+  anchor: DOMRect,
   bubble: DOMRect,
-  preferred: Side,
-): { side: Side; shiftX: number } {
-  const gap = 8;
-  let side = preferred;
-  const need = bubble.height + gap;
-  const spaceAbove = wrap.top;
-  const spaceBelow = window.innerHeight - wrap.bottom;
+): { placement: 'left' | 'right'; shiftY: number } {
+  const spaceRight = window.innerWidth - anchor.right - GAP;
+  const spaceLeft = anchor.left - GAP;
+  const placement =
+    spaceRight >= bubble.width || spaceRight >= spaceLeft ? 'right' : 'left';
 
-  if (side === 'top' && need > spaceAbove && spaceBelow > spaceAbove) {
-    side = 'bottom';
-  } else if (side === 'bottom' && need > spaceBelow && spaceAbove > spaceBelow) {
-    side = 'top';
-  }
+  const idealTop = anchor.top + anchor.height / 2 - bubble.height / 2;
+  const minTop = EDGE;
+  const maxTop = Math.max(EDGE, window.innerHeight - EDGE - bubble.height);
+  const clampedTop = Math.min(maxTop, Math.max(minTop, idealTop));
+  const shiftY = clampedTop - idealTop;
 
-  const centerX = wrap.left + wrap.width / 2;
-  const idealLeft = centerX - bubble.width / 2;
-  const minLeft = EDGE;
-  const maxLeft = Math.max(EDGE, window.innerWidth - EDGE - bubble.width);
-  const clampedLeft = Math.min(maxLeft, Math.max(minLeft, idealLeft));
-
-  return { side, shiftX: clampedLeft - idealLeft };
+  return { placement, shiftY };
 }
 
-/** Hover/focus 또는 ? 아이콘 탭으로 한·영 설명을 보여줍니다. */
-export function Tooltip({
-  text,
-  textEn,
-  children,
-  side = 'top',
-  className,
-}: Props) {
+/** ? 아이콘 옆 12px 간격으로 한·영 설명을 보여줍니다. */
+export function Tooltip({ text, textEn, children, className }: Props) {
   const tipId = useId();
   const wrapRef = useRef<HTMLSpanElement>(null);
+  const anchorRef = useRef<HTMLSpanElement>(null);
   const bubbleRef = useRef<HTMLSpanElement>(null);
   const [hovered, setHovered] = useState(false);
   const [pinned, setPinned] = useState(false);
-  const [placedSide, setPlacedSide] = useState<Side>(side);
-  const [shiftX, setShiftX] = useState(0);
+  const [placement, setPlacement] = useState<'left' | 'right'>('right');
+  const [shiftY, setShiftY] = useState(0);
   const open = hovered || pinned;
 
   useEffect(() => {
@@ -193,27 +181,25 @@ export function Tooltip({
 
   useLayoutEffect(() => {
     if (!open) {
-      setShiftX(0);
-      setPlacedSide(side);
+      setPlacement('right');
+      setShiftY(0);
       return;
     }
 
     const update = () => {
-      const wrapEl = wrapRef.current;
+      const anchorEl = anchorRef.current;
       const bubbleEl = bubbleRef.current;
-      if (!wrapEl || !bubbleEl) return;
+      if (!anchorEl || !bubbleEl) return;
 
-      const next = fitPlacement(
-        wrapEl.getBoundingClientRect(),
+      const next = fitBeside(
+        anchorEl.getBoundingClientRect(),
         bubbleEl.getBoundingClientRect(),
-        side,
       );
-      setPlacedSide(next.side);
-      setShiftX(next.shiftX);
+      setPlacement(next.placement);
+      setShiftY(next.shiftY);
     };
 
     update();
-    // side flip 후 한 번 더 재측정
     const frame = window.requestAnimationFrame(update);
     window.addEventListener('resize', update);
     window.addEventListener('scroll', update, true);
@@ -223,7 +209,7 @@ export function Tooltip({
       window.removeEventListener('resize', update);
       window.removeEventListener('scroll', update, true);
     };
-  }, [open, side, text, textEn]);
+  }, [open, text, textEn]);
 
   return (
     <Wrap
@@ -233,30 +219,32 @@ export function Tooltip({
       onMouseLeave={() => setHovered(false)}
     >
       <Main>{children}</Main>
-      <HintButton
-        type="button"
-        aria-label="기능 설명"
-        aria-expanded={open}
-        aria-describedby={open ? tipId : undefined}
-        onClick={(event) => {
-          event.preventDefault();
-          event.stopPropagation();
-          setPinned((prev) => !prev);
-        }}
-      >
-        ?
-      </HintButton>
-      <Bubble
-        ref={bubbleRef}
-        id={tipId}
-        role="tooltip"
-        $open={open}
-        $side={placedSide}
-        $shiftX={shiftX}
-      >
-        <strong>{text}</strong>
-        {textEn ? <em>{textEn}</em> : null}
-      </Bubble>
+      <Anchor ref={anchorRef}>
+        <HintButton
+          type="button"
+          aria-label="기능 설명"
+          aria-expanded={open}
+          aria-describedby={open ? tipId : undefined}
+          onClick={(event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            setPinned((prev) => !prev);
+          }}
+        >
+          ?
+        </HintButton>
+        <Bubble
+          ref={bubbleRef}
+          id={tipId}
+          role="tooltip"
+          $open={open}
+          $placement={placement}
+          $shiftY={shiftY}
+        >
+          <strong>{text}</strong>
+          {textEn ? <em>{textEn}</em> : null}
+        </Bubble>
+      </Anchor>
     </Wrap>
   );
 }

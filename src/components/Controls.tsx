@@ -8,6 +8,7 @@ type Props = {
   onTeamCountChange: (count: number) => void;
   onRandomAssign: () => void;
   onClearAssignments: () => void;
+  onOpenTactics: () => void;
 };
 
 const Bar = styled.div`
@@ -96,6 +97,7 @@ export function Controls({
   onTeamCountChange,
   onRandomAssign,
   onClearAssignments,
+  onOpenTactics,
 }: Props) {
   return (
     <Bar>
@@ -143,6 +145,19 @@ export function Controls({
           disabled={memberCount === 0 || isExporting}
         >
           밸런스 랜덤 조짜기
+        </Button>
+      </TipSlot>
+      <TipSlot
+        text="배정된 선수를 코트/보드에 올려 전술을 배치합니다."
+        textEn="Open the tactics board to place assigned players."
+      >
+        <Button
+          type="button"
+          $variant="ghost"
+          onClick={onOpenTactics}
+          disabled={memberCount === 0 || isExporting}
+        >
+          전술짜기
         </Button>
       </TipSlot>
     </Bar>

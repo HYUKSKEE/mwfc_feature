@@ -9,17 +9,20 @@ import {
 } from '@dnd-kit/core';
 import type { DragEndEvent, UniqueIdentifier } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
+import { BrowserRouter, Route, Routes, useNavigate } from 'react-router-dom';
 import styled, { ThemeProvider, keyframes } from 'styled-components';
 import { BatchImportModal } from './components/BatchImportModal';
 import { CopyRosterButton } from './components/CopyRosterButton';
 import { Controls } from './components/Controls';
 import { ExportHost } from './components/ExportHost';
 import { MemberForm } from './components/MemberForm';
+import { SiteFooter } from './components/SiteFooter';
 import { TeamColumn } from './components/TeamColumn';
 import { TeamExportCard } from './components/TeamExportCard';
 import { Tooltip } from './components/Tooltip';
 import { UnassignedPool } from './components/UnassignedPool';
-import { APP_VERSION, UNASSIGNED_ID } from './constants';
+import { UNASSIGNED_ID } from './constants';
+import { TacticsPage } from './pages/TacticsPage';
 import { loadData, saveData } from './storage';
 import { GlobalStyle } from './styles/GlobalStyle';
 import { theme } from './styles/theme';
@@ -177,9 +180,9 @@ const TeamGrid = styled.div`
 `;
 
 const OverlayCard = styled.div`
-  display: flex;
-  align-items: center;
-  min-width: 200px;
+  box-sizing: border-box;
+  min-width: 60px;
+  max-width: min(240px, 70vw);
   padding: 0.75rem 0.9rem;
   background: ${({ theme }) => theme.colors.bgElevated};
   border: 1px solid ${({ theme }) => theme.colors.accent};
@@ -189,51 +192,9 @@ const OverlayCard = styled.div`
   font-weight: 500;
   cursor: grabbing;
   touch-action: none;
-`;
-
-const SiteFooter = styled.footer`
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem 1rem;
-  margin-top: 0.75rem;
-  padding-top: 1.25rem;
-  border-top: 1px solid ${({ theme }) => theme.colors.border};
-  color: ${({ theme }) => theme.colors.textMuted};
-  font-size: 0.82rem;
-  line-height: 1.4;
-`;
-
-const FooterMeta = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.45rem 0.75rem;
-`;
-
-const FooterVersion = styled.span`
-  padding: 0.12rem 0.4rem;
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  border-radius: ${({ theme }) => theme.radii.sm};
-  color: ${({ theme }) => theme.colors.textMuted};
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-`;
-
-const FooterLink = styled.a`
-  color: ${({ theme }) => theme.colors.textMuted};
-  text-decoration: none;
-  border-bottom: 1px solid transparent;
-  transition:
-    color 0.15s ease,
-    border-color 0.15s ease;
-
-  &:hover {
-    color: ${({ theme }) => theme.colors.text};
-    border-bottom-color: ${({ theme }) => theme.colors.borderStrong};
-  }
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;
 
 function createId() {
@@ -246,7 +207,8 @@ const measuring = {
   },
 };
 
-function App() {
+function HomePage() {
+  const navigate = useNavigate();
   const [data, setData] = useState(() => loadData());
   const [activeMember, setActiveMember] = useState<Member | null>(null);
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
@@ -477,10 +439,8 @@ function App() {
   };
 
   return (
-    <ThemeProvider theme={theme}>
-      <GlobalStyle />
-      <Page>
-        <Shell>
+    <Page>
+      <Shell>
           <Brand>
             <BrandMark>
               TEAM<span>MAKER</span>
@@ -531,6 +491,7 @@ function App() {
             onTeamCountChange={handleTeamCountChange}
             onRandomAssign={handleRandomAssign}
             onClearAssignments={handleClearAssignments}
+            onOpenTactics={() => navigate('/tactics')}
           />
 
           <DndContext
@@ -575,15 +536,7 @@ function App() {
             </DragOverlay>
           </DndContext>
 
-          <SiteFooter>
-            <FooterMeta>
-              <span>© {new Date().getFullYear()} hyukskee</span>
-              <FooterVersion>v{APP_VERSION}</FooterVersion>
-            </FooterMeta>
-            <FooterLink href="mailto:gin280833@gmail.com">
-              Contact: gin280833@gmail.com
-            </FooterLink>
-          </SiteFooter>
+          <SiteFooter />
 
           <ExportHost>
             <div ref={exportHostRef}>
@@ -598,6 +551,19 @@ function App() {
           </ExportHost>
         </Shell>
       </Page>
+  );
+}
+
+function App() {
+  return (
+    <ThemeProvider theme={theme}>
+      <GlobalStyle />
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/tactics" element={<TacticsPage />} />
+        </Routes>
+      </BrowserRouter>
     </ThemeProvider>
   );
 }
