@@ -4,6 +4,7 @@ import type { Member, SkillLevel, Team } from '../types';
 import { CopyListButton } from './CopyListButton';
 import { DropZone } from './DropZone';
 import { MemberCard } from './MemberCard';
+import { Tooltip } from './Tooltip';
 
 type Props = {
   team: Team;
@@ -103,21 +104,32 @@ export function TeamColumn({
     <Column>
       <Header>
         <TitleRow>
-          <Title>{team.name}</Title>
+          <Tooltip
+            text="드래그로 팀원을 넣고 빼며 이 조를 구성합니다."
+            textEn="Drag players here to build this team."
+            side="bottom"
+          >
+            <Title>{team.name}</Title>
+          </Tooltip>
           <Count>
             {members.length}명 · 실력합 {skillTotal}
           </Count>
         </TitleRow>
         <Actions>
           <CopyListButton title={team.name} members={copyMembers} />
-          <ExportButton
-            type="button"
-            disabled={members.length === 0 || exportDisabled}
-            onClick={() => onExportImage(team.id)}
-            aria-label={`${team.name} 이미지 저장`}
+          <Tooltip
+            text="이 조 명단을 이미지(PNG)로 저장합니다."
+            textEn="Download this team's roster as a PNG image."
           >
-            {isSavingImage ? '저장 중...' : '이미지 저장'}
-          </ExportButton>
+            <ExportButton
+              type="button"
+              disabled={members.length === 0 || exportDisabled}
+              onClick={() => onExportImage(team.id)}
+              aria-label={`${team.name} 이미지 저장`}
+            >
+              {isSavingImage ? '저장 중...' : '이미지 저장'}
+            </ExportButton>
+          </Tooltip>
         </Actions>
       </Header>
       <DropZone

@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { Tooltip } from './Tooltip';
 
 type Props = {
   teamCount: number;
@@ -61,6 +62,7 @@ const Button = styled.button<{ $variant?: 'primary' | 'ghost' }>`
   transition:
     background 0.15s ease,
     border-color 0.15s ease;
+  width: 100%;
 
   &:hover:not(:disabled) {
     background: ${({ theme, $variant }) =>
@@ -71,7 +73,9 @@ const Button = styled.button<{ $variant?: 'primary' | 'ghost' }>`
     opacity: 0.45;
     cursor: not-allowed;
   }
+`;
 
+const TipSlot = styled(Tooltip)`
   @media (max-width: 860px) {
     flex: 1 1 calc(50% - 0.3rem);
   }
@@ -95,36 +99,52 @@ export function Controls({
 }: Props) {
   return (
     <Bar>
-      <Label>
-        조 개수
-        <Select
-          value={teamCount}
-          onChange={(event) => onTeamCountChange(Number(event.target.value))}
-          aria-label="조 개수"
-        >
-          {Array.from({ length: 10 }, (_, index) => index + 1).map((count) => (
-            <option key={count} value={count}>
-              {count}팀
-            </option>
-          ))}
-        </Select>
-      </Label>
+      <TipSlot
+        text="나눌 팀(조) 개수를 선택합니다."
+        textEn="Choose how many teams to split into."
+        side="bottom"
+      >
+        <Label>
+          조 개수
+          <Select
+            value={teamCount}
+            onChange={(event) => onTeamCountChange(Number(event.target.value))}
+            aria-label="조 개수"
+          >
+            {Array.from({ length: 10 }, (_, index) => index + 1).map((count) => (
+              <option key={count} value={count}>
+                {count}팀
+              </option>
+            ))}
+          </Select>
+        </Label>
+      </TipSlot>
       <Spacer />
-      <Button
-        type="button"
-        $variant="ghost"
-        onClick={onClearAssignments}
-        disabled={memberCount === 0 || isExporting}
+      <TipSlot
+        text="모든 팀원을 대기 인원으로 되돌립니다."
+        textEn="Move everyone back to the unassigned pool."
       >
-        배정 초기화
-      </Button>
-      <Button
-        type="button"
-        onClick={onRandomAssign}
-        disabled={memberCount === 0 || isExporting}
+        <Button
+          type="button"
+          $variant="ghost"
+          onClick={onClearAssignments}
+          disabled={memberCount === 0 || isExporting}
+        >
+          배정 초기화
+        </Button>
+      </TipSlot>
+      <TipSlot
+        text="인원 수와 실력을 맞춰 팀을 고르게 나눕니다."
+        textEn="Auto-balance teams by headcount and skill."
       >
-        밸런스 랜덤 조짜기
-      </Button>
+        <Button
+          type="button"
+          onClick={onRandomAssign}
+          disabled={memberCount === 0 || isExporting}
+        >
+          밸런스 랜덤 조짜기
+        </Button>
+      </TipSlot>
     </Bar>
   );
 }

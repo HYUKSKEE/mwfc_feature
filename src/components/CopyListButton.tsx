@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import styled from 'styled-components';
 import { copyText, formatMemberList } from '../utils/copyText';
+import { Tooltip } from './Tooltip';
 
 type Props = {
   title: string;
@@ -53,14 +54,19 @@ export function CopyListButton({ title, members, disabled }: Props) {
   };
 
   return (
-    <Button
-      type="button"
-      $copied={copied}
-      onClick={handleCopy}
-      disabled={disabled || members.length === 0}
-      aria-label={`${title} 명단 복사`}
+    <Tooltip
+      text="이 목록 이름을 줄바꿈으로 복사합니다."
+      textEn="Copy these names as a newline-separated list."
     >
-      {copied ? '복사됨' : '리스트 복사'}
-    </Button>
+      <Button
+        type="button"
+        $copied={copied}
+        onClick={handleCopy}
+        disabled={disabled || members.length === 0}
+        aria-label={`${title} 명단 복사`}
+      >
+        {copied ? '복사됨' : '리스트 복사'}
+      </Button>
+    </Tooltip>
   );
 }

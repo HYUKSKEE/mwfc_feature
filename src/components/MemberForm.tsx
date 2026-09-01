@@ -3,6 +3,7 @@ import type { FormEvent } from 'react';
 import styled from 'styled-components';
 import { DEFAULT_SKILL, SKILL_OPTIONS } from '../constants/skill';
 import type { SkillLevel } from '../types';
+import { Tooltip } from './Tooltip';
 
 type Props = {
   onSubmit: (name: string, skill: SkillLevel) => void;
@@ -14,8 +15,16 @@ const Form = styled.form`
   gap: 0.65rem;
 `;
 
-const Input = styled.input`
+const NameTip = styled(Tooltip)`
   flex: 1 1 160px;
+  min-width: 0;
+
+  input {
+    width: 100%;
+  }
+`;
+
+const Input = styled.input`
   min-width: 0;
   min-height: 44px;
   padding: 0.8rem 1rem;
@@ -76,7 +85,17 @@ const Button = styled.button`
   }
 
   @media (max-width: 860px) {
+    width: 100%;
+  }
+`;
+
+const TipSlot = styled(Tooltip)`
+  @media (max-width: 860px) {
     flex: 1 1 100%;
+
+    ${Button} {
+      width: 100%;
+    }
   }
 `;
 
@@ -95,28 +114,46 @@ export function MemberForm({ onSubmit }: Props) {
 
   return (
     <Form onSubmit={handleSubmit}>
-      <Input
-        value={name}
-        onChange={(event) => setName(event.target.value)}
-        placeholder="팀원 이름 입력..."
-        aria-label="팀원 이름"
-        enterKeyHint="done"
-        autoComplete="off"
-      />
-      <Select
-        value={skill}
-        onChange={(event) => setSkill(Number(event.target.value) as SkillLevel)}
-        aria-label="실력"
+      <NameTip
+        text="추가할 선수 이름을 입력합니다."
+        textEn="Enter the player name to add."
+        side="bottom"
       >
-        {SKILL_OPTIONS.map((option) => (
-          <option key={option.value} value={option.value}>
-            실력 {option.label}
-          </option>
-        ))}
-      </Select>
-      <Button type="submit" disabled={!name.trim()}>
-        팀원 추가
-      </Button>
+        <Input
+          value={name}
+          onChange={(event) => setName(event.target.value)}
+          placeholder="팀원 이름 입력..."
+          aria-label="팀원 이름"
+          enterKeyHint="done"
+          autoComplete="off"
+        />
+      </NameTip>
+      <Tooltip
+        text="1(최하)~7(최상) 실력. 밸런스 조짜기에 사용됩니다."
+        textEn="Skill 1 (lowest) to 7 (highest) for balanced teams."
+        side="bottom"
+      >
+        <Select
+          value={skill}
+          onChange={(event) => setSkill(Number(event.target.value) as SkillLevel)}
+          aria-label="실력"
+        >
+          {SKILL_OPTIONS.map((option) => (
+            <option key={option.value} value={option.value}>
+              실력 {option.label}
+            </option>
+          ))}
+        </Select>
+      </Tooltip>
+      <TipSlot
+        text="입력한 이름과 실력으로 대기 인원에 추가합니다."
+        textEn="Add this player to the unassigned pool."
+        side="bottom"
+      >
+        <Button type="submit" disabled={!name.trim()}>
+          팀원 추가
+        </Button>
+      </TipSlot>
     </Form>
   );
 }

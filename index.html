@@ -4,48 +4,110 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0a0a0a" />
+    <meta name="color-scheme" content="dark" />
+    <link rel="canonical" href="https://mwfc-feature.vercel.app/" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <title>TEAMMAKER — 조편성</title>
+
+    <title>TEAMMAKER — Balanced Team Maker for Futsal &amp; Sports</title>
     <meta
       name="description"
-      content="팀원을 추가하고 드래그로 조를 편성하거나 랜덤으로 나눠보세요."
+      content="TEAMMAKER helps you add players, set skill levels, drag-and-drop into teams, or auto-balance random teams. Free online team maker for futsal and pickup games. 팀원을 추가하고 실력 밸런스로 조를 편성하세요."
     />
+    <meta
+      name="keywords"
+      content="team maker, balanced teams, futsal, soccer, pickup game, random team generator, skill balance, 조짜기, 팀메이커, 풋살, 밸런스 조편성"
+    />
+    <meta name="author" content="MWFC — MY WAY FUTSAL CLUB" />
+    <meta name="robots" content="index, follow" />
+    <meta name="googlebot" content="index, follow" />
 
-    <!-- Absolute URLs required by Twitter/X, Kakao, Discord, etc. -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="TEAMMAKER" />
     <meta property="og:locale" content="ko_KR" />
+    <meta property="og:locale:alternate" content="en_US" />
     <meta property="og:url" content="https://mwfc-feature.vercel.app/" />
-    <meta property="og:title" content="TEAMMAKER — 조편성" />
+    <meta
+      property="og:title"
+      content="TEAMMAKER — Balanced Team Maker for Futsal &amp; Sports"
+    />
     <meta
       property="og:description"
-      content="팀원을 추가하고 드래그로 조를 편성하거나 랜덤으로 나눠보세요."
+      content="Add players, set skills, drag into teams, or auto-balance random teams. Free online team maker. 실력 밸런스 조편성 웹앱."
     />
     <meta property="og:image" content="https://mwfc-feature.vercel.app/mwfc-og.jpg" />
     <meta property="og:image:secure_url" content="https://mwfc-feature.vercel.app/mwfc-og.jpg" />
     <meta property="og:image:type" content="image/jpeg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="MWFC — MY WAY FUTSAL CLUB" />
+    <meta property="og:image:alt" content="TEAMMAKER — balanced team maker by MWFC" />
     <link rel="image_src" href="https://mwfc-feature.vercel.app/mwfc-og.jpg" />
 
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="TEAMMAKER — 조편성" />
+    <meta
+      name="twitter:title"
+      content="TEAMMAKER — Balanced Team Maker for Futsal &amp; Sports"
+    />
     <meta
       name="twitter:description"
-      content="팀원을 추가하고 드래그로 조를 편성하거나 랜덤으로 나눠보세요."
+      content="Add players, set skills, drag into teams, or auto-balance random teams. Free online team maker."
     />
     <meta name="twitter:image" content="https://mwfc-feature.vercel.app/mwfc-og.jpg" />
     <meta property="twitter:image" content="https://mwfc-feature.vercel.app/mwfc-og.jpg" />
-    <meta name="twitter:image:alt" content="MWFC — MY WAY FUTSAL CLUB" />
+    <meta name="twitter:image:alt" content="TEAMMAKER — balanced team maker by MWFC" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "TEAMMAKER",
+        "alternateName": "MWFC Team Maker",
+        "url": "https://mwfc-feature.vercel.app/",
+        "description": "Online team maker for futsal and sports. Add players with skill levels, drag-and-drop assign teams, or generate balanced random teams.",
+        "applicationCategory": "SportsApplication",
+        "operatingSystem": "Any",
+        "browserRequirements": "Requires JavaScript",
+        "inLanguage": ["ko", "en"],
+        "isAccessibleForFree": true,
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "creator": {
+          "@type": "Organization",
+          "name": "MWFC — MY WAY FUTSAL CLUB"
+        },
+        "featureList": [
+          "Add players with skill ratings",
+          "Drag and drop team assignment",
+          "Balanced random team generation",
+          "Batch import roster from text or image OCR",
+          "Copy roster and export team images"
+        ]
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>
+    <noscript>
+      <main>
+        <h1>TEAMMAKER — Balanced Team Maker</h1>
+        <p>
+          Free online team maker for futsal and pickup sports. Add players, set
+          skill levels, drag-and-drop into teams, or auto-balance random teams.
+        </p>
+        <p>
+          팀원을 추가하고 실력을 설정한 뒤 드래그로 조를 편성하거나, 밸런스
+          랜덤 조짜기로 고르게 나눌 수 있는 웹 앱입니다.
+        </p>
+      </main>
+    </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

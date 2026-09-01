@@ -17,6 +17,7 @@ import { ExportHost } from './components/ExportHost';
 import { MemberForm } from './components/MemberForm';
 import { TeamColumn } from './components/TeamColumn';
 import { TeamExportCard } from './components/TeamExportCard';
+import { Tooltip } from './components/Tooltip';
 import { UnassignedPool } from './components/UnassignedPool';
 import { UNASSIGNED_ID } from './constants';
 import { loadData, saveData } from './storage';
@@ -78,13 +79,14 @@ const Brand = styled.header`
   margin-bottom: 0.35rem;
 `;
 
-const BrandMark = styled.p`
+const BrandMark = styled.h1`
   margin: 0;
   font-family: ${({ theme }) => theme.fonts.display};
   font-size: clamp(2.6rem, 10vw, 4.75rem);
   line-height: 0.9;
   letter-spacing: 0.08em;
   color: ${({ theme }) => theme.colors.white};
+  font-weight: 400;
 
   span {
     color: ${({ theme }) => theme.colors.accent};
@@ -95,8 +97,16 @@ const Tagline = styled.p`
   margin: 0;
   color: ${({ theme }) => theme.colors.textMuted};
   font-size: 0.95rem;
-  max-width: 40ch;
+  max-width: 52ch;
   line-height: 1.45;
+`;
+
+const TaglineEn = styled.span`
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.86rem;
+  color: ${({ theme }) => theme.colors.textMuted};
+  opacity: 0.85;
 `;
 
 const Panel = styled.section`
@@ -432,6 +442,9 @@ function App() {
             </BrandMark>
             <Tagline>
               실력을 정해 팀원을 추가하면, 밸런스 랜덤 조짜기로 고르게 나눌 수 있어요.
+              <TaglineEn>
+                Add players with skill levels, then drag into teams or auto-balance.
+              </TaglineEn>
             </Tagline>
           </Brand>
 
@@ -442,12 +455,18 @@ function App() {
                 <CopyRosterButton
                   names={data.members.map((member) => member.name)}
                 />
-                <GhostButton
-                  type="button"
-                  onClick={() => setBatchImportOpen(true)}
+                <Tooltip
+                  text="텍스트 붙여넣기 또는 명단 이미지 OCR로 여러 명을 한 번에 등록합니다."
+                  textEn="Bulk-add players via pasted names or roster image OCR."
+                  side="bottom"
                 >
-                  일괄 등록
-                </GhostButton>
+                  <GhostButton
+                    type="button"
+                    onClick={() => setBatchImportOpen(true)}
+                  >
+                    일괄 등록
+                  </GhostButton>
+                </Tooltip>
               </PanelActions>
             </PanelHeader>
             <MemberForm onSubmit={handleAddMember} />

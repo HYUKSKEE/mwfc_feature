@@ -5,6 +5,7 @@ import type { Member, SkillLevel } from '../types';
 import { CopyListButton } from './CopyListButton';
 import { DropZone } from './DropZone';
 import { MemberCard } from './MemberCard';
+import { Tooltip } from './Tooltip';
 
 export { UNASSIGNED_ID };
 
@@ -65,7 +66,13 @@ export function UnassignedPool({ members, onUpdate, onDelete }: Props) {
     <Panel>
       <Header>
         <TitleRow>
-          <Title>대기 인원</Title>
+          <Tooltip
+            text="아직 조에 넣지 않은 팀원입니다. 핸들로 드래그하세요."
+            textEn="Unassigned players. Drag by the handle into a team."
+            side="bottom"
+          >
+            <Title>대기 인원</Title>
+          </Tooltip>
           <Count>{members.length}명</Count>
         </TitleRow>
         <Actions>

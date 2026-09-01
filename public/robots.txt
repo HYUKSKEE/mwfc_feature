@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://mwfc-feature.vercel.app/sitemap.xml
