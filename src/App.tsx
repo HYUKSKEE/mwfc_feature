@@ -19,7 +19,7 @@ import { TeamColumn } from './components/TeamColumn';
 import { TeamExportCard } from './components/TeamExportCard';
 import { Tooltip } from './components/Tooltip';
 import { UnassignedPool } from './components/UnassignedPool';
-import { UNASSIGNED_ID } from './constants';
+import { APP_VERSION, UNASSIGNED_ID } from './constants';
 import { loadData, saveData } from './storage';
 import { GlobalStyle } from './styles/GlobalStyle';
 import { theme } from './styles/theme';
@@ -189,6 +189,51 @@ const OverlayCard = styled.div`
   font-weight: 500;
   cursor: grabbing;
   touch-action: none;
+`;
+
+const SiteFooter = styled.footer`
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  margin-top: 0.75rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid ${({ theme }) => theme.colors.border};
+  color: ${({ theme }) => theme.colors.textMuted};
+  font-size: 0.82rem;
+  line-height: 1.4;
+`;
+
+const FooterMeta = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem 0.75rem;
+`;
+
+const FooterVersion = styled.span`
+  padding: 0.12rem 0.4rem;
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  border-radius: ${({ theme }) => theme.radii.sm};
+  color: ${({ theme }) => theme.colors.textMuted};
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+`;
+
+const FooterLink = styled.a`
+  color: ${({ theme }) => theme.colors.textMuted};
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease;
+
+  &:hover {
+    color: ${({ theme }) => theme.colors.text};
+    border-bottom-color: ${({ theme }) => theme.colors.borderStrong};
+  }
 `;
 
 function createId() {
@@ -529,6 +574,16 @@ function App() {
               {activeMember ? <OverlayCard>{activeMember.name}</OverlayCard> : null}
             </DragOverlay>
           </DndContext>
+
+          <SiteFooter>
+            <FooterMeta>
+              <span>© {new Date().getFullYear()} hyukskee</span>
+              <FooterVersion>v{APP_VERSION}</FooterVersion>
+            </FooterMeta>
+            <FooterLink href="mailto:gin280833@gmail.com">
+              Contact: gin280833@gmail.com
+            </FooterLink>
+          </SiteFooter>
 
           <ExportHost>
             <div ref={exportHostRef}>
